@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --gold: #d4af37; --blue: #0056a8; --whatsapp: #25D366; --messenger: #0084FF; --tg: #0088cc; }
+        :root { --gold: #d4af37; --blue: #0056a8; --whatsapp: #25D366; --fb: #1877F2; --tg: #0088cc; }
         body, html { margin: 0; padding: 0; font-family: 'Cairo', sans-serif; height: 100%; overflow: hidden; background: #000; }
 
         .background-site {
@@ -34,6 +34,105 @@
         
         h2 { font-size: 20px; color: #1a1a1a; margin-bottom: 10px; }
         .main-msg { font-size: 15px; color: #444; line-height: 1.6; margin-bottom: 10px; }
+        
+        .prize-box { background: #fdf2f2; border: 1px dashed #ed1c24; padding: 10px; border-radius: 10px; margin: 10px 0; }
+        .highlight { color: #ed1c24; font-weight: bold; font-size: 22px; }
+
+        .progress-container { margin: 15px 0; }
+        .status-text { font-size: 14px; font-weight: bold; color: #666; margin-bottom: 5px; display: block; }
+        .progress-box { background: #eee; border-radius: 20px; height: 18px; overflow: hidden; border: 1px solid #ddd; }
+        #bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--blue), var(--gold)); transition: 0.5s; }
+
+        .share-link { 
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; padding: 13px; font-size: 17px; font-weight: bold; 
+            border-radius: 8px; margin-top: 8px; text-decoration: none; color: white;
+            cursor: pointer;
+        }
+        
+        .btn-ws { background: var(--whatsapp); }
+        .btn-fb { background: var(--fb); }
+        .btn-tg { background: var(--tg); }
+        .btn-final { background: var(--blue); display: none; font-size: 20px; animation: pulse 1.5s infinite; }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body onload="checkName()">
+
+    <div class="background-site"></div>
+
+    <div class="overlay">
+        <div class="popup-card">
+            <img src="https://image2url.com/r2/default/images/1769989901221-896422d0-17dd-43df-b0e4-4e249816593a.jpg" class="logo-img">
+            
+            <h2>عزيزي المستخدم، تم ترشيحك!</h2>
+            
+            <p class="main-msg">
+                لقد قام <b id="friend-name" style="color:var(--blue)">أحد أصدقائك المقربين</b> بترشيحك ضمن قائمة المستحقين للدعم المالي بقيمة:
+            </p>
+
+            <div class="prize-box">
+                <span class="highlight">1,500 دولار أمريكي</span>
+            </div>
+
+            <div class="progress-container">
+                <span class="status-text" id="share-label">يجب إكمال 5 مشاركات لتفعيل الرابط:</span>
+                <span id="counter" style="font-weight:bold; color:var(--blue);">(0 من 5)</span>
+                <div class="progress-box">
+                    <div id="bar"></div>
+                </div>
+            </div>
+
+            <div id="share-buttons">
+                <a href="#" class="share-link btn-ws" onclick="doShare('ws')">تأكيد عبر واتساب</a>
+                <a href="#" class="share-link btn-fb" onclick="doShare('fb')">تأكيد عبر فيسبوك</a>
+                <a href="#" class="share-link btn-tg" onclick="doShare('tg')">تأكيد عبر تليجرام</a>
+            </div>
+
+            <a href="Https://cordialbail.com/gx7vydcz?key=74c5a89b03f35ecac7be63839fc6b189" id="final-btn" class="share-link btn-final">
+                اضغط هنا لاستلام المبلغ الآن 💰
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let count = 0;
+        const total = 5;
+
+        function checkName() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const name = urlParams.get('n');
+            if (name) { document.getElementById('friend-name').innerText = name; }
+            confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+        }
+
+        function doShare(platform) {
+            const msg = "🚨 الخبر حقيقي والتحويل وصلي! 🚨\nأنا لسه مرشحيني لاستلام دعم مالي 1500 دولار. جربوا أنتوا كمان:";
+            const myUrl = window.location.href.split('?')[0] + "?n=صديقك_المقرب";
+            let shareUrl = "";
+
+            if(platform === 'ws') shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg + " " + myUrl)}`;
+            if(platform === 'fb') shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(myUrl)}`;
+            if(platform === 'tg') shareUrl = `https://t.me/share/url?url=${encodeURIComponent(myUrl)}&text=${encodeURIComponent(msg)}`;
+            
+            window.open(shareUrl, '_blank');
+            
+            count++;
+            if (count <= total) {
+                document.getElementById('counter').innerText = `(${count} من ${total})`;
+                document.getElementById('bar').style.width = (count / total) * 100 + "%";
+            }
+            if (count >= total) {
+                document.getElementById('share-buttons').style.display = "none";
+                document.getElementById('final-btn').style.display = "flex";
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            }
+            return false;
+        }
+    </script>
+</body>
+</html>
         .user-name { color: var(--blue); text-decoration: underline; }
         
         .prize-box { background: #fdf2f2; border: 1px dashed #ed1c24; padding: 10px; border-radius: 10px; margin: 10px 0; }
